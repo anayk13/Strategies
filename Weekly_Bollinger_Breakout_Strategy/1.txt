@@ -1,0 +1,89 @@
+📄 Strategy Documentation
+
+Strategy Name: Weekly Bollinger Breakout with 200 MA Exit
+
+1. Objective
+
+This strategy aims to capture strong upward breakouts on weekly charts by entering when price closes above the upper Bollinger Band and exiting only when long-term weakness is confirmed via the 200-period moving average.
+
+2. Indicators Used
+
+Bollinger Bands (50,2):
+
+Based on a 50-period simple moving average (weekly).
+
+Upper Band = SMA(50) + (2 × standard deviation of last 50 closes).
+
+Lower Band = SMA(50) – (2 × standard deviation of last 50 closes).
+
+Purpose: Detect volatility breakouts beyond the normal range.
+
+200-period Moving Average (200 MA):
+
+Based on the last 200 weekly closes.
+
+Purpose: Acts as a long-term trend filter and risk management exit trigger.
+
+3. Entry Rule (Buy)
+
+Condition: If the weekly closing price > upper Bollinger Band (50,2).
+
+Action: Enter a long position at the next candle (or at close, depending on execution rules).
+
+Rationale: A close above the upper band indicates strong bullish momentum breaking beyond normal volatility.
+
+4. Exit Rule (Sell)
+
+Condition: If the weekly closing price < 200-period moving average.
+
+Action: Exit the existing long position.
+
+Rationale: A close below the 200 MA indicates long-term weakness and trend reversal risk.
+
+5. Position Management
+
+One position at a time.
+
+No pyramiding (adding more after entry).
+
+Stay flat until a fresh Buy condition is met again.
+
+6. Backtesting / Live Execution Logic
+
+The strategy follows a state-based flow:
+
+Initialization:
+
+Start with no open trades.
+
+Each new weekly candle:
+
+If no trade open:
+
+Check if Close > Upper Bollinger Band.
+
+If true → Buy.
+
+If trade open:
+
+Check if Close < 200 MA.
+
+If true → Exit position.
+
+Logging Trades:
+
+Record entry date, entry price, exit date, exit price.
+
+Compute profit/loss and holding duration.
+
+Performance Metrics to Evaluate:
+
+CAGR (annualized return).
+
+Max drawdown.
+
+Win rate.
+
+Average trade duration.
+
+Risk-adjusted return (Sharpe ratio).
