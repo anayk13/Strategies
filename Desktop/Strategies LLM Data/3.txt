@@ -1,0 +1,79 @@
+📄 Strategy Documentation
+
+Strategy Name: Gap-Up + Bollinger Band Exit
+
+1. Objective
+
+This strategy aims to capture short-term profit opportunities and protect gains by selling stocks that exhibit strong upward price spikes (gap-ups) combined with being overextended relative to recent volatility (above upper Bollinger Band).
+
+2. Indicators / Metrics Used
+
+Gap-Up Detection:
+
+Condition: Today’s Open > Previous Close.
+
+Purpose: Identify stocks that start the day significantly higher than the prior day’s close, signaling potential overbought conditions or profit-taking opportunities.
+
+Bollinger Bands (50,2):
+
+Upper Band = 50-period SMA + 2 × standard deviation of the last 50 closes.
+
+Condition: Current price > upper Bollinger Band.
+
+Purpose: Detect overextension and high volatility breakout areas.
+
+3. Entry Rule (Sell / Exit)
+
+Condition: If stock opens gap up AND the current price is above the upper Bollinger Band, then:
+
+Sell (or short, depending on the strategy) at market price.
+
+Rationale:
+
+A gap-up above the upper Bollinger Band often indicates overbought conditions.
+
+This is a profit-taking / risk management signal, reducing exposure when the stock may reverse.
+
+4. Position Management
+
+Apply to all open long positions.
+
+Only trigger once per stock per signal.
+
+If the stock doesn’t meet the condition, continue holding.
+
+Can be combined with other strategies (e.g., momentum holding or trend-following) for dynamic risk management.
+
+5. Backtesting / Live Execution Logic
+
+The strategy follows a daily-check flow:
+
+For each trading day:
+
+Calculate previous day’s close.
+
+Calculate 50-period SMA and upper Bollinger Band.
+
+Check if:
+
+Today’s Open > Previous Close (gap-up)
+
+Today’s Open (or High) > Upper Bollinger Band
+
+If both conditions are met → Sell.
+
+Position Tracking:
+
+Maintain a record of which stocks were sold, at what price, and when.
+
+Helps in analyzing effectiveness of gap-up exits over time.
+
+Performance Metrics to Evaluate:
+
+Profit per signal.
+
+Reduction in drawdown compared to holding all longs.
+
+Win rate of gap-up + upper BB sell signals.
+
+Average reversal after signal.

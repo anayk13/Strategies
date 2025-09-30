@@ -1,0 +1,43 @@
+.
+
+📄 Strategy Documentation
+
+Strategy Name: Volume Breakout Buy
+
+1. Objective
+
+This strategy aims to capture potential upward momentum by buying stocks when their current volume exceeds the 100-day average volume.
+
+2. Indicator Used
+
+100-Day Average Volume:
+
+Calculated as the simple average of the stock’s volume over the past 100 trading days.
+
+Purpose: Provides a benchmark for normal trading activity.
+
+3. Entry Rule (Buy)
+
+Condition: Current day’s volume > 100-day average volume.
+
+Action: Enter a long position at market price.
+
+4. Position Management
+
+Apply only when the entry condition is met.
+
+No additional rules specified for exit.
+
+5. Backtesting / Live Execution Logic
+
+Daily Check:
+
+Calculate the 100-day average volume.
+
+Compare today’s volume with this average.
+
+If today’s volume exceeds the 100-day average → Buy.
+
+Record Keeping:
+
+Track entry date, stock, and price.

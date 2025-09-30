@@ -1,0 +1,152 @@
+.
+
+📄 Strategy Documentation
+
+Strategy Name: Top-3 12-Month Momentum Stocks
+
+1. Objective
+
+This strategy aims to capture strong upward trends by buying the three stocks with the highest trailing 12-month returns and holding them for the next three months. It is a classic momentum-based, time-bound strategy.
+
+2. Indicators / Metrics Used
+
+12-Month Return (Trailing):
+
+Calculated as the percentage price change over the past 12 months:
+
+𝑅
+𝑒
+𝑡
+𝑢
+𝑟
+𝑛
+12
+𝑀
+=
+𝑃
+𝑟
+𝑖
+𝑐
+𝑒
+𝑡
+𝑜
+𝑑
+𝑎
+𝑦
+−
+𝑃
+𝑟
+𝑖
+𝑐
+𝑒
+12
+𝑀
+_
+𝑎
+𝑔
+𝑜
+𝑃
+𝑟
+𝑖
+𝑐
+𝑒
+12
+𝑀
+_
+𝑎
+𝑔
+𝑜
+×
+100
+Return
+12M
+	​
+
+=
+Price
+12M_ago
+	​
+
+Price
+today
+	​
+
+−Price
+12M_ago
+	​
+
+	​
+
+×100
+
+Purpose: Identify the strongest-performing stocks over the past year.
+
+Holding Period:
+
+Fixed at 3 months after entry.
+
+Purpose: Limit exposure and lock in momentum gains.
+
+3. Entry Rule (Buy)
+
+At the start of each 3-month cycle:
+
+Rank all eligible stocks by their trailing 12-month returns.
+
+Select the top 3 stocks with the highest returns.
+
+Buy these stocks at the current market price (or next available open).
+
+Rationale: Stocks with strong past performance tend to continue trending upward over the short term (momentum effect).
+
+4. Exit Rule (Sell)
+
+Sell all positions exactly 3 months after purchase, regardless of performance.
+
+Rationale: Avoid overexposure to momentum reversals; this also allows a rebalancing cycle.
+
+5. Position Management
+
+Equal-weight allocation to all three selected stocks.
+
+No new positions until the next 3-month cycle.
+
+During the holding period:
+
+No additional buys in the same stock.
+
+Avoid reinvesting in the same stock until the next cycle.
+
+6. Backtesting / Live Execution Logic
+
+The strategy follows a time-cycle-based flow:
+
+Cycle Initialization (Every 3 Months):
+
+Calculate trailing 12-month returns for all eligible stocks.
+
+Rank stocks and select top 3.
+
+Buy selected stocks at market price.
+
+Holding Period (3 Months):
+
+Maintain positions; ignore short-term fluctuations.
+
+Cycle End:
+
+Sell all positions.
+
+Record entry/exit dates, prices, and profits/losses.
+
+Performance Metrics to Evaluate:
+
+CAGR (annualized return).
+
+Maximum drawdown.
+
+Win rate (percentage of profitable cycles).
+
+Average return per cycle.
+
+Sharpe ratio / risk-adjusted return.
