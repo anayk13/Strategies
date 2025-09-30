@@ -497,3 +497,4 @@ class LiquidityAwareMomentumStrategy(Strategy):
         self.entry_price = None
         self.highest_price = None
         self.entry_date = None
+

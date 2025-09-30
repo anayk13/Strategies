@@ -413,3 +413,4 @@ class StatisticalPairsMeanReversionStrategy(Strategy):
         self.position = 0
         self.entry_date = None
         self.beta = None
+

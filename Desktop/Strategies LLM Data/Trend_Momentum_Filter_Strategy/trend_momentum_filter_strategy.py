@@ -377,3 +377,4 @@ class TrendMomentumFilterStrategy(Strategy):
             'win_rate': win_rate
         }
 
+

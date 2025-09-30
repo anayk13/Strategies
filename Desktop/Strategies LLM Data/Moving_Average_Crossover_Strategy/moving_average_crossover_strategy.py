@@ -228,3 +228,4 @@ class MovingAverageCrossoverStrategy(Strategy):
         """Reset position state (useful for backtesting)."""
         self.position = 0
 
+

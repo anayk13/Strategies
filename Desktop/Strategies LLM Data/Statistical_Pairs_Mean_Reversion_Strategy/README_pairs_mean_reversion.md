@@ -162,3 +162,4 @@ signals = strategy.generate_signals(data)
 
 - `statistical_pairs_mean_reversion_strategy.py`: Main strategy implementation
 - `README_pairs_mean_reversion.md`: This documentation file
+
