@@ -227,3 +227,4 @@ class MovingAverageCrossoverStrategy(Strategy):
     def reset_position(self):
         """Reset position state (useful for backtesting)."""
         self.position = 0
+

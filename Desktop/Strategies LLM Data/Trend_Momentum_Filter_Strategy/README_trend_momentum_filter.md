@@ -170,3 +170,4 @@ metrics = strategy.get_performance_metrics(data)
 
 - `trend_momentum_filter_strategy.py`: Main strategy implementation
 - `README_trend_momentum_filter.md`: This documentation file
+

@@ -376,3 +376,4 @@ class TrendMomentumFilterStrategy(Strategy):
             'max_drawdown': max_drawdown,
             'win_rate': win_rate
         }
+
