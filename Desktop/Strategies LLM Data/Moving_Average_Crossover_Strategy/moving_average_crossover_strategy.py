@@ -25,11 +25,20 @@ class MovingAverageCrossoverStrategy(Strategy):
         self.params = params or {
             'short_ma_period': 50,
             'long_ma_period': 200,
-            'position_size': 1.0
+            'position_size': 1.0,
+            'atr_period': 14,
+            'atr_multiplier': 2.0,
+            'max_risk_per_trade': 0.02,  # 2% max risk per trade
+            'trailing_stop_atr': 1.5,    # Trailing stop at 1.5x ATR
+            'max_holding_days': 60       # Maximum holding period
         }
         self.signals = None
         self.trades = None
         self.position = 0  # 0 = flat, 1 = long, -1 = short
+        self.entry_price = None
+        self.stop_loss = None
+        self.trailing_stop = None
+        self.entry_date = None
 
     def preprocess_data(self, data, context=None):
         """
@@ -48,7 +57,7 @@ class MovingAverageCrossoverStrategy(Strategy):
             return data
         
         # Ensure we have required columns
-        required_cols = ['close']
+        required_cols = ['close', 'high', 'low']
         if not all(col in data.columns for col in required_cols):
             raise ValueError(f"Data must contain columns: {required_cols}")
         
@@ -81,19 +90,28 @@ class MovingAverageCrossoverStrategy(Strategy):
         short_ma = data['close'].rolling(window=self.params['short_ma_period']).mean()
         long_ma = data['close'].rolling(window=self.params['long_ma_period']).mean()
         
+        # Calculate ATR for risk management
+        high_low = data['high'] - data['low']
+        high_close = np.abs(data['high'] - data['close'].shift())
+        low_close = np.abs(data['low'] - data['close'].shift())
+        true_range = np.maximum(high_low, np.maximum(high_close, low_close))
+        atr = true_range.rolling(window=self.params['atr_period']).mean()
+        
         # Initialize signals
         signals = pd.Series(0, index=data.index)
         
-        # State-based logic for crossover detection
+        # State-based logic for crossover detection with risk management
         for i in range(self.params['long_ma_period'], len(data)):
             current_short_ma = short_ma.iloc[i]
             current_long_ma = long_ma.iloc[i]
             prev_short_ma = short_ma.iloc[i-1]
             prev_long_ma = long_ma.iloc[i-1]
+            current_price = data['close'].iloc[i]
+            current_atr = atr.iloc[i]
             
             # Skip if we don't have enough data for indicators
             if pd.isna(current_short_ma) or pd.isna(current_long_ma) or \
-               pd.isna(prev_short_ma) or pd.isna(prev_long_ma):
+               pd.isna(prev_short_ma) or pd.isna(prev_long_ma) or pd.isna(current_atr):
                 continue
             
             # Golden Cross: Short MA crosses above Long MA (Entry)
@@ -102,6 +120,11 @@ class MovingAverageCrossoverStrategy(Strategy):
                 current_short_ma > current_long_ma):
                 signals.iloc[i] = 1  # Buy signal
                 self.position = 1
+                self.entry_price = current_price
+                self.entry_date = i
+                # Set initial stop loss at 2x ATR below entry
+                self.stop_loss = current_price - (self.params['atr_multiplier'] * current_atr)
+                self.trailing_stop = self.stop_loss
                 
             # Death Cross: Short MA crosses below Long MA (Exit)
             elif (self.position == 1 and 
@@ -109,6 +132,36 @@ class MovingAverageCrossoverStrategy(Strategy):
                   current_short_ma < current_long_ma):
                 signals.iloc[i] = -1  # Sell signal
                 self.position = 0
+                self.entry_price = None
+                self.stop_loss = None
+                self.trailing_stop = None
+                self.entry_date = None
+                
+            # Risk Management: Check for stop loss hits
+            elif self.position == 1:
+                # Update trailing stop if price moves favorably
+                if current_price > self.entry_price:
+                    new_trailing_stop = current_price - (self.params['trailing_stop_atr'] * current_atr)
+                    if new_trailing_stop > self.trailing_stop:
+                        self.trailing_stop = new_trailing_stop
+                
+                # Check if stop loss is hit
+                if current_price <= self.trailing_stop:
+                    signals.iloc[i] = -1  # Sell signal due to stop loss
+                    self.position = 0
+                    self.entry_price = None
+                    self.stop_loss = None
+                    self.trailing_stop = None
+                    self.entry_date = None
+                
+                # Check for maximum holding period
+                elif self.entry_date is not None and (i - self.entry_date) >= self.params['max_holding_days']:
+                    signals.iloc[i] = -1  # Sell signal due to time limit
+                    self.position = 0
+                    self.entry_price = None
+                    self.stop_loss = None
+                    self.trailing_stop = None
+                    self.entry_date = None
         
         self.signals = signals
         return pd.DataFrame({'Signal': signals}, index=data.index)
@@ -165,6 +218,41 @@ class MovingAverageCrossoverStrategy(Strategy):
                 "max": 10.0, 
                 "default": 1.0,
                 "description": "Position size multiplier"
+            },
+            "atr_period": {
+                "type": "int", 
+                "min": 5, 
+                "max": 50, 
+                "default": 14,
+                "description": "Period for Average True Range calculation"
+            },
+            "atr_multiplier": {
+                "type": "float", 
+                "min": 1.0, 
+                "max": 5.0, 
+                "default": 2.0,
+                "description": "ATR multiplier for initial stop loss"
+            },
+            "max_risk_per_trade": {
+                "type": "float", 
+                "min": 0.005, 
+                "max": 0.1, 
+                "default": 0.02,
+                "description": "Maximum risk per trade as percentage of capital"
+            },
+            "trailing_stop_atr": {
+                "type": "float", 
+                "min": 0.5, 
+                "max": 3.0, 
+                "default": 1.5,
+                "description": "ATR multiplier for trailing stop loss"
+            },
+            "max_holding_days": {
+                "type": "int", 
+                "min": 10, 
+                "max": 200, 
+                "default": 60,
+                "description": "Maximum holding period in days"
             }
         }
 
